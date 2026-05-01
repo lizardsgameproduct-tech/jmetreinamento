@@ -31,26 +31,6 @@
       color: var(--text-primary); 
       min-height: 100vh;
     }
-    .header { 
-      background: var(--surface-2); 
-      border-bottom: 1px solid var(--border); 
-      padding: 20px 40px; 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center;
-    }
-    .header-title { font-family: var(--font-display); font-size: 24px; font-weight: 700; }
-    .logout-btn { 
-      background: var(--green); 
-      color: #000; 
-      border: none; 
-      padding: 10px 20px; 
-      border-radius: 6px; 
-      cursor: pointer; 
-      font-weight: 600;
-      transition: all 0.2s;
-    }
-    .logout-btn:hover { background: var(--green-hover); }
     
     .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
     
@@ -142,11 +122,6 @@
   </style>
 </head>
 <body>
-  <div class="header">
-    <h1 class="header-title">Dashboard de Gestão</h1>
-    <button class="logout-btn" id="logout-btn">Sair</button>
-  </div>
-
   <div class="container">
     <!-- KPIs -->
     <div class="kpi-grid">
@@ -214,15 +189,16 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    const SUPABASE_URL = 'https://qpmglhxlnbdzozrtffmf.supabase.co'
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwbWdsaHhsbmJkem96cnRmZm1mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1ODAyOTEsImV4cCI6MjA5MzE1NjI5MX0.LxZ-w8fkYv3wLcCyyxp8nft9uh1YI9kaV12mzUjh8YA'
-    const { createClient } = supabase
-    const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  <script type="module">
+    import { supabase } from '../js/config/supabase.js'
+    import { initNavbar } from '../js/modules/navbar.js'
 
-    let currentUser = null
+    const db = supabase
 
     document.addEventListener('DOMContentLoaded', async () => {
+      // Iniciar Navbar
+      await initNavbar()
+
       // Verificar autenticação
       const { data: { user } } = await db.auth.getUser()
       if (!user) {
@@ -230,34 +206,24 @@
         return
       }
 
-      // Verificar role de gestor
+      // Verificar role de gestor ou admin
       const { data: profile } = await db
         .from('profiles')
         .select('role, company_id')
         .eq('id', user.id)
         .single()
 
-      if (profile?.role !== 'gestor') {
+      if (profile?.role !== 'gestor' && profile?.role !== 'admin') {
         window.location.href = '/src/pages/meus-cursos.html'
         return
       }
 
-      currentUser = user
       const companyId = profile.company_id
-
-      // Carregar dados
       await loadDashboard(companyId)
-
-      // Logout
-      document.getElementById('logout-btn').addEventListener('click', async () => {
-        await db.auth.signOut()
-        window.location.href = '/src/pages/login.html'
-      })
     })
 
     async function loadDashboard(companyId) {
       try {
-        // Carregar estatísticas
         const { data: users } = await db
           .from('profiles')
           .select('*')
@@ -269,7 +235,6 @@
           .select('completed')
           .eq('company_id', companyId)
 
-        // Atualizar KPIs
         document.getElementById('kpi-users').textContent = users?.length || 0
         
         const completed = enrollments?.filter(e => e.completed).length || 0
@@ -277,14 +242,10 @@
         const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0
         document.getElementById('kpi-completion').textContent = completionRate + '%'
 
-        // Simular taxa de phishing (em produção, viria do banco)
         const phishingRate = Math.floor(Math.random() * 40) + 10
         document.getElementById('kpi-phishing').textContent = phishingRate + '%'
 
-        // Carregar tabela de colaboradores
         renderUsersTable(users || [])
-
-        // Renderizar gráficos
         renderCharts(completionRate, phishingRate)
       } catch (error) {
         console.error('Erro ao carregar dashboard:', error)
@@ -293,7 +254,6 @@
 
     function renderUsersTable(users) {
       const tbody = document.getElementById('users-table')
-      
       if (users.length === 0) {
         tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Nenhum colaborador cadastrado</td></tr>'
         return
@@ -318,7 +278,6 @@
     }
 
     function renderCharts(completionRate, phishingRate) {
-      // Gráfico de Conclusão
       const completionData = [{
         values: [completionRate, 100 - completionRate],
         labels: ['Concluído', 'Em Andamento'],
@@ -333,7 +292,6 @@
         margin: { l: 0, r: 0, t: 0, b: 0 }
       }, { responsive: true })
 
-      // Gráfico de Phishing
       const phishingData = [{
         x: ['Abriram', 'Clicaram', 'Reportaram'],
         y: [Math.round(phishingRate * 0.8), phishingRate, Math.round(phishingRate * 0.3)],
