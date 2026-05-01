@@ -4,17 +4,22 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Meus Cursos — JMR Tecnologia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --black: #000000;
       --surface-1: #0D0D0D;
       --surface-2: #111827;
       --border: #1F2937;
       --green: #00FF41;
+      --green-hover: #00CC33;
       --text-primary: #F9FAFB;
       --text-secondary: #D1D5DB;
       --text-muted: #9CA3AF;
+      --text-faint: #6B7280;
       --font-display: 'Syne', sans-serif;
       --font-body: 'DM Sans', sans-serif;
     }
@@ -24,9 +29,8 @@
       background: var(--black); 
       color: var(--text-primary); 
       min-height: 100vh;
-      padding: 40px 20px;
     }
-    .container { max-width: 1200px; margin: 0 auto; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
     .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
     .title { font-family: var(--font-display); font-size: 32px; font-weight: 700; }
     .logout-btn { 
@@ -39,16 +43,93 @@
       font-weight: 600;
       transition: all 0.2s;
     }
-    .logout-btn:hover { background: #00CC33; }
-    .content { 
-      background: var(--surface-2); 
-      border: 1px solid var(--border); 
-      border-radius: 12px; 
-      padding: 40px; 
-      text-align: center;
-      color: var(--text-muted);
+    .logout-btn:hover { background: var(--green-hover); }
+    
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
+    
+    .card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      transition: all 0.3s;
+      cursor: pointer;
     }
-    .user-info { margin-top: 20px; font-size: 14px; }
+    
+    .card:hover {
+      border-color: var(--green);
+      box-shadow: 0 0 20px rgba(0, 255, 65, 0.1);
+    }
+    
+    .card-icon { font-size: 32px; margin-bottom: 12px; }
+    .card-title { font-family: var(--font-display); font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+    .card-desc { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px; }
+    
+    .card-action {
+      display: inline-block;
+      background: var(--green);
+      color: #000;
+      padding: 8px 16px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all 0.2s;
+      border: none;
+      cursor: pointer;
+    }
+    
+    .card-action:hover { background: var(--green-hover); }
+    
+    .progress-section {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-top: 40px;
+    }
+    
+    .section-title { font-family: var(--font-display); font-size: 20px; font-weight: 700; margin-bottom: 20px; }
+    
+    .progress-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      background: var(--surface-1);
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+    
+    .progress-item-name { font-weight: 600; }
+    .progress-item-bar {
+      flex: 1;
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      margin: 0 16px;
+      overflow: hidden;
+    }
+    
+    .progress-item-fill {
+      height: 100%;
+      background: var(--green);
+      transition: width 0.3s;
+    }
+    
+    .progress-item-percent { font-size: 13px; color: var(--text-muted); min-width: 40px; text-align: right; }
+    
+    .loading { text-align: center; padding: 40px; color: var(--text-muted); }
+    .spinner { 
+      width: 20px; 
+      height: 20px; 
+      border: 2px solid var(--border); 
+      border-top-color: var(--green); 
+      border-radius: 50%; 
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
@@ -58,10 +139,35 @@
       <button class="logout-btn" id="logout-btn">Sair</button>
     </div>
     
-    <div class="content">
-      <p>Bem-vindo à plataforma de treinamento JMR Tecnologia!</p>
-      <p style="margin-top: 20px; font-size: 13px; color: var(--text-muted);">Seus cursos e treinamentos aparecerão aqui.</p>
-      <div class="user-info" id="user-info"></div>
+    <div class="grid">
+      <div class="card">
+        <div class="card-icon">📚</div>
+        <h3 class="card-title">Treinamento Completo</h3>
+        <p class="card-desc">30 aulas sobre segurança da informação, phishing e resposta a incidentes.</p>
+        <a href="/src/pages/treinamento.html" class="card-action">Começar Treinamento</a>
+      </div>
+      
+      <div class="card">
+        <div class="card-icon">📊</div>
+        <h3 class="card-title">Meu Progresso</h3>
+        <p class="card-desc">Acompanhe seu desempenho, certificados e histórico de simulações.</p>
+        <button class="card-action" id="view-progress-btn">Ver Progresso</button>
+      </div>
+      
+      <div class="card">
+        <div class="card-icon">🎖️</div>
+        <h3 class="card-title">Certificados</h3>
+        <p class="card-desc">Baixe seus certificados de conclusão e compartilhe suas credenciais.</p>
+        <button class="card-action" id="view-certs-btn">Meus Certificados</button>
+      </div>
+    </div>
+    
+    <div class="progress-section">
+      <h2 class="section-title">Progresso Geral</h2>
+      <div id="progress-list" class="loading">
+        <div class="spinner"></div>
+        <p>Carregando dados...</p>
+      </div>
     </div>
   </div>
 
@@ -80,15 +186,69 @@
         return
       }
 
-      // Exibir informações do usuário
-      document.getElementById('user-info').innerHTML = `Logado como: <strong>${user.email}</strong>`
+      // Carregar progresso
+      await loadProgress(user.id)
 
       // Logout
       document.getElementById('logout-btn').addEventListener('click', async () => {
         await db.auth.signOut()
         window.location.href = '/src/pages/login.html'
       })
+
+      // Botões de ação
+      document.getElementById('view-progress-btn').addEventListener('click', () => {
+        alert('Funcionalidade em desenvolvimento')
+      })
+
+      document.getElementById('view-certs-btn').addEventListener('click', () => {
+        alert('Funcionalidade em desenvolvimento')
+      })
     })
+
+    async function loadProgress(userId) {
+      try {
+        // Carregar cursos
+        const { data: courses } = await db
+          .from('courses')
+          .select('*')
+          .order('order_index', { ascending: true })
+
+        // Carregar progresso do usuário
+        const { data: enrollments } = await db
+          .from('enrollments')
+          .select('course_id, completed')
+          .eq('user_id', userId)
+
+        const progressList = document.getElementById('progress-list')
+        
+        if (!courses || courses.length === 0) {
+          progressList.innerHTML = '<p style="color: var(--text-muted);">Nenhum curso disponível no momento.</p>'
+          return
+        }
+
+        let html = ''
+        courses.forEach(course => {
+          const enrollment = enrollments?.find(e => e.course_id === course.id)
+          const isCompleted = enrollment?.completed || false
+          const percentage = isCompleted ? 100 : 0
+
+          html += `
+            <div class="progress-item">
+              <span class="progress-item-name">Aula ${course.order_index}: ${course.title}</span>
+              <div class="progress-item-bar">
+                <div class="progress-item-fill" style="width: ${percentage}%"></div>
+              </div>
+              <span class="progress-item-percent">${percentage}%</span>
+            </div>
+          `
+        })
+
+        progressList.innerHTML = html
+      } catch (error) {
+        console.error('Erro ao carregar progresso:', error)
+        document.getElementById('progress-list').innerHTML = '<p style="color: var(--text-muted);">Erro ao carregar progresso</p>'
+      }
+    }
   </script>
 </body>
 </html>
