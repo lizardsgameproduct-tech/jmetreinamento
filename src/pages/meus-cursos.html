@@ -31,19 +31,7 @@
       min-height: 100vh;
     }
     .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
-    .title { font-family: var(--font-display); font-size: 32px; font-weight: 700; }
-    .logout-btn { 
-      background: var(--green); 
-      color: #000; 
-      border: none; 
-      padding: 10px 20px; 
-      border-radius: 6px; 
-      cursor: pointer; 
-      font-weight: 600;
-      transition: all 0.2s;
-    }
-    .logout-btn:hover { background: var(--green-hover); }
+    .title { font-family: var(--font-display); font-size: 32px; font-weight: 700; margin-bottom: 32px; }
     
     .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
     
@@ -76,11 +64,12 @@
       transition: all 0.2s;
       border: none;
       cursor: pointer;
+      width: 100%;
+      text-align: center;
     }
     
     .card-action:hover { background: var(--green-hover); }
     
-    /* Modal Styles */
     .modal {
       display: none;
       position: fixed;
@@ -179,10 +168,7 @@
 </head>
 <body>
   <div class="container">
-    <div class="header">
-      <h1 class="title">Meus Cursos</h1>
-      <button class="logout-btn" id="logout-btn">Sair</button>
-    </div>
+    <h1 class="title">Meus Cursos</h1>
     
     <div class="grid">
       <div class="card">
@@ -252,27 +238,25 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module">
     import { supabase } from '../js/config/supabase.js'
+    import { initNavbar } from '../js/modules/navbar.js'
 
     const db = supabase
     let currentUser = null
     let userProfile = null
 
     document.addEventListener('DOMContentLoaded', async () => {
+      // Iniciar Navbar dinâmica
+      await initNavbar()
+
       const { data: { user } } = await db.auth.getUser()
       if (!user) { window.location.href = '/src/pages/login.html'; return; }
       currentUser = user
 
-      // Buscar perfil
       const { data: profile } = await db.from('profiles').select('*').eq('id', user.id).single()
       userProfile = profile
 
       await loadProgress(user.id)
       await loadCompanies()
-
-      document.getElementById('logout-btn').addEventListener('click', async () => {
-        await db.auth.signOut()
-        window.location.href = '/src/pages/login.html'
-      })
 
       document.getElementById('start-training-btn').addEventListener('click', () => {
         checkProfileAndStart()
@@ -307,7 +291,6 @@
       if (isComplete) {
         window.location.href = '/src/pages/treinamento.html'
       } else {
-        // Preencher o que já existe
         document.getElementById('p-email').value = currentUser.email
         document.getElementById('p-full_name').value = userProfile?.full_name || ''
         document.getElementById('p-telefone').value = userProfile?.telefone || ''
