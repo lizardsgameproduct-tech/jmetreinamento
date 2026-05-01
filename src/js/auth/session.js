@@ -1,13 +1,13 @@
 import { supabase } from '../config/supabase.js'
 
-// Retorna o perfil completo do usuário logado (com role e company_id)
+// Retorna o perfil completo do usuário logado
 export async function getProfile() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('*, companies(name, plan, active)')
+    .select('*, empresas(nome_fantasia)')
     .eq('id', user.id)
     .single()
 
@@ -21,7 +21,9 @@ export function redirectByRole(role) {
     gestor:       '/src/pages/dashboard-gestor.html',
     colaborador:  '/src/pages/meus-cursos.html'
   }
-  window.location.href = routes[role] ?? '/src/pages/meus-cursos.html'
+  
+  const target = routes[role] || '/src/pages/meus-cursos.html'
+  window.location.href = target
 }
 
 // Protege qualquer página — redireciona para login se não autenticado
