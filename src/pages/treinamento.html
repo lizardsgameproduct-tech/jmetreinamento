@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Treinamento — JMR Tecnologia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --black: #000000;
+      --surface-1: #0D0D0D;
+      --surface-2: #111827;
+      --border: #1F2937;
+      --green: #00FF41;
+      --green-hover: #00CC33;
+      --text-primary: #F9FAFB;
+      --text-secondary: #D1D5DB;
+      --text-muted: #9CA3AF;
+      --text-faint: #6B7280;
+      --font-display: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+    }
+    html { -webkit-font-smoothing: antialiased; }
+    body { 
+      font-family: var(--font-body); 
+      background: var(--black); 
+      color: var(--text-primary); 
+      min-height: 100vh;
+    }
+    .container { max-width: 1400px; margin: 0 auto; }
+    .header { 
+      background: var(--surface-2); 
+      border-bottom: 1px solid var(--border); 
+      padding: 20px 40px; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+    }
+    .header-title { font-family: var(--font-display); font-size: 24px; font-weight: 700; }
+    .logout-btn { 
+      background: var(--green); 
+      color: #000; 
+      border: none; 
+      padding: 10px 20px; 
+      border-radius: 6px; 
+      cursor: pointer; 
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .logout-btn:hover { background: var(--green-hover); }
+    
+    .content { display: grid; grid-template-columns: 1fr 280px; gap: 20px; padding: 20px 40px; }
+    
+    .video-player {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      aspect-ratio: 16 / 9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      position: relative;
+    }
+    
+    .video-player iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: 8px;
+    }
+    
+    .lesson-info {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+    
+    .lesson-title { font-family: var(--font-display); font-size: 20px; font-weight: 700; margin-bottom: 12px; }
+    .lesson-description { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px; }
+    
+    .lesson-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    
+    .btn {
+      flex: 1;
+      padding: 10px 16px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+    
+    .btn-primary { background: var(--green); color: #000; }
+    .btn-primary:hover { background: var(--green-hover); }
+    .btn-secondary { background: var(--surface-1); color: var(--text-primary); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: var(--border); }
+    
+    .sidebar {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      max-height: 600px;
+      overflow-y: auto;
+    }
+    
+    .sidebar-title { 
+      font-family: var(--font-display); 
+      font-size: 14px; 
+      font-weight: 700; 
+      margin-bottom: 16px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .lesson-list { display: flex; flex-direction: column; gap: 8px; }
+    
+    .lesson-item {
+      padding: 12px;
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    
+    .lesson-item:hover { background: var(--border); }
+    .lesson-item.active { background: var(--green); color: #000; font-weight: 600; }
+    .lesson-item.completed { border-left: 3px solid var(--green); }
+    
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 12px;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: var(--green);
+      transition: width 0.3s;
+    }
+    
+    .loading { text-align: center; padding: 40px; color: var(--text-muted); }
+    .spinner { 
+      width: 20px; 
+      height: 20px; 
+      border: 2px solid var(--border); 
+      border-top-color: var(--green); 
+      border-radius: 50%; 
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    @media (max-width: 1024px) {
+      .content { grid-template-columns: 1fr; }
+      .sidebar { max-height: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1 class="header-title">Treinamento em Segurança</h1>
+    <button class="logout-btn" id="logout-btn">Sair</button>
+  </div>
+
+  <div class="container">
+    <div class="content">
+      <div>
+        <div class="video-player" id="video-player">
+          <div class="loading">
+            <div class="spinner"></div>
+            <p>Carregando aula...</p>
+          </div>
+        </div>
+        
+        <div class="lesson-info">
+          <h2 class="lesson-title" id="lesson-title">Selecione uma aula</h2>
+          <p class="lesson-description" id="lesson-description">Clique em uma aula na lista ao lado para começar.</p>
+          
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+          </div>
+          
+          <div class="lesson-actions">
+            <button class="btn btn-primary" id="mark-complete-btn" style="display: none;">Marcar como Concluído</button>
+            <button class="btn btn-secondary" id="download-materials-btn" style="display: none;">Baixar Materiais</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="sidebar">
+        <div class="sidebar-title">Aulas (30)</div>
+        <div class="lesson-list" id="lesson-list">
+          <div class="loading">
+            <div class="spinner"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module">
+    import { supabase } from '../js/config/supabase.js'
+
+    const SUPABASE_URL = 'https://qpmglhxlnbdzozrtffmf.supabase.co'
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwbWdsaHhsbmJkem96cnRmZm1mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1ODAyOTEsImV4cCI6MjA5MzE1NjI5MX0.LxZ-w8fkYv3wLcCyyxp8nft9uh1YI9kaV12mzUjh8YA'
+    const { createClient } = supabase
+    const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+    let currentUser = null
+    let currentLesson = null
+    let allLessons = []
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Verificar autenticação
+      const { data: { user } } = await db.auth.getUser()
+      if (!user) {
+        window.location.href = '/src/pages/login.html'
+        return
+      }
+      currentUser = user
+
+      // Carregar aulas
+      await loadLessons()
+
+      // Logout
+      document.getElementById('logout-btn').addEventListener('click', async () => {
+        await db.auth.signOut()
+        window.location.href = '/src/pages/login.html'
+      })
+
+      // Marcar como concluído
+      document.getElementById('mark-complete-btn').addEventListener('click', async () => {
+        if (!currentLesson) return
+        await markLessonComplete(currentLesson.id)
+      })
+    })
+
+    async function loadLessons() {
+      try {
+        const { data, error } = await db
+          .from('courses')
+          .select('*')
+          .order('order_index', { ascending: true })
+
+        if (error) throw error
+
+        allLessons = data || []
+        renderLessonList()
+
+        // Carregar primeira aula
+        if (allLessons.length > 0) {
+          selectLesson(allLessons[0])
+        }
+      } catch (error) {
+        console.error('Erro ao carregar aulas:', error)
+        document.getElementById('lesson-list').innerHTML = '<p style="color: var(--text-muted);">Erro ao carregar aulas</p>'
+      }
+    }
+
+    function renderLessonList() {
+      const list = document.getElementById('lesson-list')
+      list.innerHTML = allLessons.map((lesson, idx) => `
+        <div class="lesson-item" onclick="selectLessonFromList(${idx})">
+          <div style="font-weight: 600; margin-bottom: 4px;">Aula ${lesson.order_index}</div>
+          <div style="font-size: 12px; opacity: 0.8;">${lesson.title}</div>
+        </div>
+      `).join('')
+    }
+
+    window.selectLessonFromList = function(idx) {
+      selectLesson(allLessons[idx])
+    }
+
+    async function selectLesson(lesson) {
+      currentLesson = lesson
+
+      // Atualizar UI
+      document.getElementById('lesson-title').textContent = `Aula ${lesson.order_index}: ${lesson.title}`
+      document.getElementById('lesson-description').textContent = lesson.description || 'Conteúdo do treinamento'
+
+      // Carregar vídeo (iframe do YouTube)
+      const videoPlayer = document.getElementById('video-player')
+      videoPlayer.innerHTML = `
+        <iframe 
+          src="https://www.youtube.com/embed/${lesson.youtube_id}?rel=0&modestbranding=1" 
+          allowfullscreen 
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        ></iframe>
+      `
+
+      // Mostrar botões
+      document.getElementById('mark-complete-btn').style.display = 'block'
+      if (lesson.material_url) {
+        document.getElementById('download-materials-btn').style.display = 'block'
+      }
+
+      // Atualizar progresso
+      await updateProgress()
+    }
+
+    async function markLessonComplete(lessonId) {
+      try {
+        const { error } = await db
+          .from('enrollments')
+          .upsert({
+            user_id: currentUser.id,
+            course_id: lessonId,
+            completed: true,
+            completed_at: new Date().toISOString()
+          })
+
+        if (error) throw error
+        alert('Aula marcada como concluída!')
+        await updateProgress()
+      } catch (error) {
+        console.error('Erro ao marcar aula como concluída:', error)
+      }
+    }
+
+    async function updateProgress() {
+      try {
+        const { data: enrollments } = await db
+          .from('enrollments')
+          .select('completed')
+          .eq('user_id', currentUser.id)
+
+        const completed = enrollments?.filter(e => e.completed).length || 0
+        const total = allLessons.length
+        const percentage = total > 0 ? (completed / total) * 100 : 0
+
+        document.getElementById('progress-fill').style.width = percentage + '%'
+      } catch (error) {
+        console.error('Erro ao atualizar progresso:', error)
+      }
+    }
+  </script>
+</body>
+</html>
