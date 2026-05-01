@@ -229,7 +229,7 @@ document.addEventListener('DOMContentLoaded', function() {
       gestor:      '/src/pages/dashboard-gestor.html',
       colaborador: '/src/pages/meus-cursos.html'
     }
-    window.location.replace(routes[role] ?? '/src/pages/meus-cursos.html')
+    window.location.href = routes[role] ?? '/src/pages/meus-cursos.html'
   }
 
   // Toast
