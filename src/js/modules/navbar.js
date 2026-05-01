@@ -4,11 +4,16 @@ export async function initNavbar() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
-    const { data: profile } = await supabase
+    // Buscar perfil com retry simples para garantir que os dados do banco carreguem
+    const { data: profile, error } = await supabase
         .from('profiles')
         .select('role, full_name')
         .eq('id', user.id)
         .single()
+
+    if (error) {
+        console.error('Erro ao carregar perfil na navbar:', error)
+    }
 
     renderNavbar(profile, user.email)
 }
@@ -20,20 +25,27 @@ function renderNavbar(profile, email) {
     const role = profile?.role || 'colaborador'
     const name = profile?.full_name || email
 
+    console.log('Navbar renderizada para role:', role) // Debug no console do navegador
+
     let menuItems = ''
     
+    // Admin vê tudo
     if (role === 'admin') {
         menuItems = `
-            <a href="/src/admin/empresas.html" class="nav-link">Empresas</a>
+            <a href="/src/pages/admin/empresas.html" class="nav-link">Empresas</a>
             <a href="/src/pages/dashboard-gestor.html" class="nav-link">Relatórios</a>
             <a href="/src/pages/meus-cursos.html" class="nav-link">Meus Cursos</a>
         `
-    } else if (role === 'gestor') {
+    } 
+    // Gestor vê sua empresa e cursos
+    else if (role === 'gestor') {
         menuItems = `
-            <a href="/src/pages/dashboard-gestor.html" class="nav-link">Empresa</a>
+            <a href="/src/pages/dashboard-gestor.html" class="nav-link">Minha Empresa</a>
             <a href="/src/pages/meus-cursos.html" class="nav-link">Meus Cursos</a>
         `
-    } else {
+    } 
+    // Colaborador vê apenas cursos
+    else {
         menuItems = `
             <a href="/src/pages/meus-cursos.html" class="nav-link">Meus Cursos</a>
         `
@@ -41,7 +53,7 @@ function renderNavbar(profile, email) {
 
     nav.innerHTML = `
         <div class="nav-container">
-            <div class="nav-brand">
+            <div class="nav-brand" onclick="window.location.href='/src/pages/meus-cursos.html'" style="cursor:pointer">
                 <span class="brand-logo">JMR</span>
                 <span class="brand-name">JMR Tecnologia</span>
             </div>
@@ -55,7 +67,7 @@ function renderNavbar(profile, email) {
         </div>
     `
 
-    // Adicionar estilos se não existirem
+    // Estilos da Navbar
     if (!document.getElementById('nav-styles')) {
         const style = document.createElement('style')
         style.id = 'nav-styles'
@@ -70,6 +82,7 @@ function renderNavbar(profile, email) {
                 position: sticky;
                 top: 0;
                 z-index: 1000;
+                width: 100%;
             }
             .nav-container {
                 width: 100%;
@@ -113,14 +126,22 @@ function renderNavbar(profile, email) {
     if (existingHeader) {
         existingHeader.replaceWith(nav)
     } else {
-        document.body.prepend(nav)
+        const navExists = document.querySelector('.top-nav')
+        if (!navExists) {
+            document.body.prepend(nav)
+        } else {
+            navExists.replaceWith(nav)
+        }
     }
 
     // Evento de logout
-    document.getElementById('nav-logout-btn').addEventListener('click', async () => {
-        await supabase.auth.signOut()
-        window.location.href = '/src/pages/login.html'
-    })
+    const logoutBtn = document.getElementById('nav-logout-btn')
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+            await supabase.auth.signOut()
+            window.location.href = '/src/pages/login.html'
+        })
+    }
 
     // Marcar link ativo
     const currentPath = window.location.pathname
