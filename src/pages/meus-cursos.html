@@ -53,7 +53,6 @@
       border-radius: 12px;
       padding: 24px;
       transition: all 0.3s;
-      cursor: pointer;
     }
     
     .card:hover {
@@ -81,6 +80,53 @@
     
     .card-action:hover { background: var(--green-hover); }
     
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .modal.active { display: flex; }
+    
+    .modal-content {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+      max-width: 500px;
+      width: 100%;
+    }
+    
+    .modal-title { font-family: var(--font-display); font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+    .modal-subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; }
+    
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; }
+    .form-input {
+      width: 100%;
+      padding: 12px;
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-size: 14px;
+    }
+    .form-input:focus { outline: none; border-color: var(--green); }
+    .form-input[readonly] { opacity: 0.6; cursor: not-allowed; }
+    
+    .modal-actions { margin-top: 24px; }
+    .btn-full { width: 100%; padding: 14px; font-size: 15px; }
+
     .progress-section {
       background: var(--surface-2);
       border: 1px solid var(--border);
@@ -119,7 +165,6 @@
     
     .progress-item-percent { font-size: 13px; color: var(--text-muted); min-width: 40px; text-align: right; }
     
-    .loading { text-align: center; padding: 40px; color: var(--text-muted); }
     .spinner { 
       width: 20px; 
       height: 20px; 
@@ -144,110 +189,178 @@
         <div class="card-icon">📚</div>
         <h3 class="card-title">Treinamento Completo</h3>
         <p class="card-desc">30 aulas sobre segurança da informação, phishing e resposta a incidentes.</p>
-        <a href="/src/pages/treinamento.html" class="card-action">Começar Treinamento</a>
+        <button class="card-action" id="start-training-btn">Começar Treinamento</button>
       </div>
       
       <div class="card">
         <div class="card-icon">📊</div>
         <h3 class="card-title">Meu Progresso</h3>
-        <p class="card-desc">Acompanhe seu desempenho, certificados e histórico de simulações.</p>
-        <button class="card-action" id="view-progress-btn">Ver Progresso</button>
-      </div>
-      
-      <div class="card">
-        <div class="card-icon">🎖️</div>
-        <h3 class="card-title">Certificados</h3>
-        <p class="card-desc">Baixe seus certificados de conclusão e compartilhe suas credenciais.</p>
-        <button class="card-action" id="view-certs-btn">Meus Certificados</button>
+        <p class="card-desc">Acompanhe seu desempenho e histórico.</p>
+        <button class="card-action" onclick="alert('Em breve')">Ver Progresso</button>
       </div>
     </div>
     
     <div class="progress-section">
       <h2 class="section-title">Progresso Geral</h2>
-      <div id="progress-list" class="loading">
+      <div id="progress-list">
         <div class="spinner"></div>
-        <p>Carregando dados...</p>
       </div>
     </div>
   </div>
 
+  <!-- Modal Perfil Colaborador -->
+  <div class="modal" id="profile-modal">
+    <div class="modal-content">
+      <h2 class="modal-title">Complete seu Perfil</h2>
+      <p class="modal-subtitle">Precisamos desses dados antes de iniciar seu treinamento.</p>
+      
+      <form id="profile-form">
+        <div class="form-group">
+          <label class="form-label">E-mail</label>
+          <input type="email" class="form-input" id="p-email" readonly>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nome Completo</label>
+          <input type="text" class="form-input" id="p-full_name" required placeholder="Seu nome completo">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Telefone</label>
+          <input type="text" class="form-input" id="p-telefone" required placeholder="(00) 00000-0000">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Empresa</label>
+          <select class="form-input" id="p-company_id" required>
+            <option value="">Selecione sua empresa</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cargo / Departamento</label>
+          <input type="text" class="form-input" id="p-cargo" required placeholder="Ex: Analista de RH">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Data de Início na Empresa</label>
+          <input type="date" class="form-input" id="p-data_inicio" required>
+        </div>
+        
+        <div class="modal-actions">
+          <button type="submit" class="btn card-action btn-full">Salvar e Iniciar Treinamento</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    const SUPABASE_URL = 'https://qpmglhxlnbdzozrtffmf.supabase.co'
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwbWdsaHhsbmJkem96cnRmZm1mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1ODAyOTEsImV4cCI6MjA5MzE1NjI5MX0.LxZ-w8fkYv3wLcCyyxp8nft9uh1YI9kaV12mzUjh8YA'
-    const { createClient } = supabase
-    const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  <script type="module">
+    import { supabase } from '../js/config/supabase.js'
+
+    const db = supabase
+    let currentUser = null
+    let userProfile = null
 
     document.addEventListener('DOMContentLoaded', async () => {
-      // Verificar autenticação
       const { data: { user } } = await db.auth.getUser()
-      if (!user) {
-        window.location.href = '/src/pages/login.html'
-        return
-      }
+      if (!user) { window.location.href = '/src/pages/login.html'; return; }
+      currentUser = user
 
-      // Carregar progresso
+      // Buscar perfil
+      const { data: profile } = await db.from('profiles').select('*').eq('id', user.id).single()
+      userProfile = profile
+
       await loadProgress(user.id)
+      await loadCompanies()
 
-      // Logout
       document.getElementById('logout-btn').addEventListener('click', async () => {
         await db.auth.signOut()
         window.location.href = '/src/pages/login.html'
       })
 
-      // Botões de ação
-      document.getElementById('view-progress-btn').addEventListener('click', () => {
-        alert('Funcionalidade em desenvolvimento')
+      document.getElementById('start-training-btn').addEventListener('click', () => {
+        checkProfileAndStart()
       })
 
-      document.getElementById('view-certs-btn').addEventListener('click', () => {
-        alert('Funcionalidade em desenvolvimento')
+      document.getElementById('profile-form').addEventListener('submit', async (e) => {
+        e.preventDefault()
+        await saveProfile()
       })
     })
 
+    async function loadCompanies() {
+      const { data } = await db.from('empresas').select('id, nome_fantasia').eq('status', 'ativa')
+      const select = document.getElementById('p-company_id')
+      if (data) {
+        data.forEach(c => {
+          const opt = document.createElement('option')
+          opt.value = c.id
+          opt.textContent = c.nome_fantasia
+          select.appendChild(opt)
+        })
+      }
+    }
+
+    function checkProfileAndStart() {
+      const isComplete = userProfile?.full_name && 
+                         userProfile?.company_id && 
+                         userProfile?.telefone && 
+                         userProfile?.cargo_departamento && 
+                         userProfile?.data_inicio_empresa
+
+      if (isComplete) {
+        window.location.href = '/src/pages/treinamento.html'
+      } else {
+        // Preencher o que já existe
+        document.getElementById('p-email').value = currentUser.email
+        document.getElementById('p-full_name').value = userProfile?.full_name || ''
+        document.getElementById('p-telefone').value = userProfile?.telefone || ''
+        document.getElementById('p-company_id').value = userProfile?.company_id || ''
+        document.getElementById('p-cargo').value = userProfile?.cargo_departamento || ''
+        document.getElementById('p-data_inicio').value = userProfile?.data_inicio_empresa || ''
+        
+        document.getElementById('profile-modal').classList.add('active')
+      }
+    }
+
+    async function saveProfile() {
+      const updates = {
+        id: currentUser.id,
+        full_name: document.getElementById('p-full_name').value,
+        telefone: document.getElementById('p-telefone').value,
+        company_id: document.getElementById('p-company_id').value,
+        cargo_departamento: document.getElementById('p-cargo').value,
+        data_inicio_empresa: document.getElementById('p-data_inicio').value,
+        updated_at: new Date().toISOString()
+      }
+
+      const { error } = await db.from('profiles').upsert(updates)
+      if (error) {
+        alert('Erro ao salvar perfil: ' + error.message)
+      } else {
+        window.location.href = '/src/pages/treinamento.html'
+      }
+    }
+
     async function loadProgress(userId) {
       try {
-        // Carregar cursos
-        const { data: courses } = await db
-          .from('courses')
-          .select('*')
-          .order('order_index', { ascending: true })
+        const { data: courses } = await db.from('courses').select('*').order('order_index')
+        const { data: enrollments } = await db.from('enrollments').select('course_id, completed').eq('user_id', userId)
 
-        // Carregar progresso do usuário
-        const { data: enrollments } = await db
-          .from('enrollments')
-          .select('course_id, completed')
-          .eq('user_id', userId)
-
-        const progressList = document.getElementById('progress-list')
-        
+        const list = document.getElementById('progress-list')
         if (!courses || courses.length === 0) {
-          progressList.innerHTML = '<p style="color: var(--text-muted);">Nenhum curso disponível no momento.</p>'
+          list.innerHTML = '<p>Nenhum curso disponível.</p>'
           return
         }
 
-        let html = ''
-        courses.forEach(course => {
-          const enrollment = enrollments?.find(e => e.course_id === course.id)
-          const isCompleted = enrollment?.completed || false
-          const percentage = isCompleted ? 100 : 0
-
-          html += `
+        list.innerHTML = courses.map(course => {
+          const isCompleted = enrollments?.find(e => e.course_id === course.id)?.completed || false
+          const pct = isCompleted ? 100 : 0
+          return `
             <div class="progress-item">
               <span class="progress-item-name">Aula ${course.order_index}: ${course.title}</span>
-              <div class="progress-item-bar">
-                <div class="progress-item-fill" style="width: ${percentage}%"></div>
-              </div>
-              <span class="progress-item-percent">${percentage}%</span>
+              <div class="progress-item-bar"><div class="progress-item-fill" style="width: ${pct}%"></div></div>
+              <span class="progress-item-percent">${pct}%</span>
             </div>
           `
-        })
-
-        progressList.innerHTML = html
-      } catch (error) {
-        console.error('Erro ao carregar progresso:', error)
-        document.getElementById('progress-list').innerHTML = '<p style="color: var(--text-muted);">Erro ao carregar progresso</p>'
-      }
+        }).join('')
+      } catch (e) { console.error(e) }
     }
   </script>
 </body>
