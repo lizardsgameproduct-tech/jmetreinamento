@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestão de Empresas — JMR Tecnologia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --black: #000000;
+      --surface-1: #0D0D0D;
+      --surface-2: #111827;
+      --border: #1F2937;
+      --green: #00FF41;
+      --green-hover: #00CC33;
+      --text-primary: #F9FAFB;
+      --text-secondary: #D1D5DB;
+      --text-muted: #9CA3AF;
+      --text-faint: #6B7280;
+      --font-display: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+    }
+    html { -webkit-font-smoothing: antialiased; }
+    body { 
+      font-family: var(--font-body); 
+      background: var(--black); 
+      color: var(--text-primary); 
+      min-height: 100vh;
+    }
+    .header { 
+      background: var(--surface-2); 
+      border-bottom: 1px solid var(--border); 
+      padding: 20px 40px; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+    }
+    .header-title { font-family: var(--font-display); font-size: 24px; font-weight: 700; }
+    .header-actions { display: flex; gap: 12px; }
+    .btn {
+      padding: 10px 20px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+    .btn-primary { background: var(--green); color: #000; }
+    .btn-primary:hover { background: var(--green-hover); }
+    .btn-secondary { background: var(--surface-1); color: var(--text-primary); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: var(--border); }
+    
+    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
+    
+    .tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .tab {
+      padding: 12px 20px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-weight: 600;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    
+    .tab.active {
+      color: var(--green);
+      border-bottom-color: var(--green);
+    }
+    
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    
+    .table-card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    
+    th {
+      text-align: left;
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    td {
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    tr:last-child td { border-bottom: none; }
+    
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .status-active { background: rgba(0, 255, 65, 0.2); color: var(--green); }
+    .status-inactive { background: rgba(248, 113, 113, 0.2); color: #F87171; }
+    
+    .form-group {
+      margin-bottom: 16px;
+    }
+    
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-size: 14px;
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(0, 255, 65, 0.08);
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal.active { display: flex; }
+    
+    .modal-content {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+      max-width: 500px;
+      width: 90%;
+    }
+    
+    .modal-title { font-family: var(--font-display); font-size: 20px; font-weight: 700; margin-bottom: 20px; }
+    
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+      justify-content: flex-end;
+    }
+    
+    .loading { text-align: center; padding: 40px; color: var(--text-muted); }
+    .spinner { 
+      width: 20px; 
+      height: 20px; 
+      border: 2px solid var(--border); 
+      border-top-color: var(--green); 
+      border-radius: 50%; 
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1 class="header-title">Gestão de Empresas</h1>
+    <div class="header-actions">
+      <button class="btn btn-primary" id="new-company-btn">+ Nova Empresa</button>
+      <button class="btn btn-secondary" id="logout-btn">Sair</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('companies')">Empresas</button>
+      <button class="tab" onclick="switchTab('users')">Usuários</button>
+      <button class="tab" onclick="switchTab('settings')">Configurações</button>
+    </div>
+
+    <!-- Aba: Empresas -->
+    <div id="companies" class="tab-content active">
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Plano</th>
+              <th>Usuários</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="companies-table">
+            <tr>
+              <td colspan="5" style="text-align: center; color: var(--text-muted);">
+                <div class="spinner" style="margin: 16px auto;"></div>
+                Carregando empresas...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Aba: Usuários -->
+    <div id="users" class="tab-content">
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>E-mail</th>
+              <th>Empresa</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="users-table">
+            <tr>
+              <td colspan="6" style="text-align: center; color: var(--text-muted);">
+                <div class="spinner" style="margin: 16px auto;"></div>
+                Carregando usuários...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Aba: Configurações -->
+    <div id="settings" class="tab-content">
+      <div class="table-card">
+        <h3 style="margin-bottom: 20px;">Configurações Globais</h3>
+        <div class="form-group">
+          <label class="form-label">Versão da Plataforma</label>
+          <input type="text" class="form-input" value="1.0.0" disabled>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Modo de Manutenção</label>
+          <select class="form-input">
+            <option>Desativado</option>
+            <option>Ativado</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" style="margin-top: 16px;">Salvar Alterações</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Nova Empresa -->
+  <div class="modal" id="company-modal">
+    <div class="modal-content">
+      <h2 class="modal-title">Nova Empresa</h2>
+      <div class="form-group">
+        <label class="form-label">Nome da Empresa</label>
+        <input type="text" class="form-input" id="company-name" placeholder="Ex: Acme Corp">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Plano</label>
+        <select class="form-input" id="company-plan">
+          <option value="starter">Starter (até 50 usuários)</option>
+          <option value="professional">Professional (até 500 usuários)</option>
+          <option value="enterprise">Enterprise (ilimitado)</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeModal('company-modal')">Cancelar</button>
+        <button class="btn btn-primary" onclick="createCompany()">Criar Empresa</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = 'https://qpmglhxlnbdzozrtffmf.supabase.co'
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwbWdsaHhsbmJkem96cnRmZm1mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1ODAyOTEsImV4cCI6MjA5MzE1NjI5MX0.LxZ-w8fkYv3wLcCyyxp8nft9uh1YI9kaV12mzUjh8YA'
+    const { createClient } = supabase
+    const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Verificar autenticação
+      const { data: { user } } = await db.auth.getUser()
+      if (!user) {
+        window.location.href = '/src/pages/login.html'
+        return
+      }
+
+      // Verificar role de admin
+      const { data: profile } = await db
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+
+      if (profile?.role !== 'admin') {
+        window.location.href = '/src/pages/meus-cursos.html'
+        return
+      }
+
+      // Carregar dados
+      await loadCompanies()
+      await loadUsers()
+
+      // Event listeners
+      document.getElementById('new-company-btn').addEventListener('click', () => {
+        openModal('company-modal')
+      })
+
+      document.getElementById('logout-btn').addEventListener('click', async () => {
+        await db.auth.signOut()
+        window.location.href = '/src/pages/login.html'
+      })
+    })
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'))
+      document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'))
+      document.getElementById(tabName).classList.add('active')
+      event.target.classList.add('active')
+    }
+
+    function openModal(modalId) {
+      document.getElementById(modalId).classList.add('active')
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('active')
+    }
+
+    async function loadCompanies() {
+      try {
+        const { data } = await db.from('companies').select('*')
+        const tbody = document.getElementById('companies-table')
+        
+        if (!data || data.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Nenhuma empresa cadastrada</td></tr>'
+          return
+        }
+
+        tbody.innerHTML = data.map(company => `
+          <tr>
+            <td>${company.name}</td>
+            <td>${company.plan || 'N/A'}</td>
+            <td>${Math.floor(Math.random() * 100)}</td>
+            <td><span class="status-badge ${company.active ? 'status-active' : 'status-inactive'}">${company.active ? 'Ativa' : 'Inativa'}</span></td>
+            <td><button class="btn btn-secondary" style="padding: 6px 12px;">Editar</button></td>
+          </tr>
+        `).join('')
+      } catch (error) {
+        console.error('Erro ao carregar empresas:', error)
+      }
+    }
+
+    async function loadUsers() {
+      try {
+        const { data } = await db.from('profiles').select('*, companies(name)')
+        const tbody = document.getElementById('users-table')
+        
+        if (!data || data.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Nenhum usuário cadastrado</td></tr>'
+          return
+        }
+
+        tbody.innerHTML = data.map(user => `
+          <tr>
+            <td>${user.full_name || 'N/A'}</td>
+            <td>${user.email}</td>
+            <td>${user.companies?.name || 'N/A'}</td>
+            <td>${user.role}</td>
+            <td><span class="status-badge status-active">Ativo</span></td>
+            <td><button class="btn btn-secondary" style="padding: 6px 12px;">Editar</button></td>
+          </tr>
+        `).join('')
+      } catch (error) {
+        console.error('Erro ao carregar usuários:', error)
+      }
+    }
+
+    async function createCompany() {
+      const name = document.getElementById('company-name').value
+      const plan = document.getElementById('company-plan').value
+
+      if (!name) {
+        alert('Digite o nome da empresa')
+        return
+      }
+
+      try {
+        const { error } = await db.from('companies').insert([{
+          name,
+          plan,
+          active: true
+        }])
+
+        if (error) throw error
+        alert('Empresa criada com sucesso!')
+        closeModal('company-modal')
+        await loadCompanies()
+      } catch (error) {
+        console.error('Erro ao criar empresa:', error)
+        alert('Erro ao criar empresa')
+      }
+    }
+  </script>
+</body>
+</html>
