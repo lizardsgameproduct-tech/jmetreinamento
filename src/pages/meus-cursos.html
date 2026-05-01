@@ -93,7 +93,23 @@
       padding: 32px;
       max-width: 500px;
       width: 100%;
+      position: relative;
     }
+    
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 24px;
+      cursor: pointer;
+      transition: color 0.2s;
+      line-height: 1;
+    }
+    
+    .modal-close:hover { color: var(--text-primary); }
     
     .modal-title { font-family: var(--font-display); font-size: 22px; font-weight: 700; margin-bottom: 8px; }
     .modal-subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; }
@@ -197,6 +213,7 @@
   <!-- Modal Perfil Colaborador -->
   <div class="modal" id="profile-modal">
     <div class="modal-content">
+      <button class="modal-close" id="close-profile-modal">&times;</button>
       <h2 class="modal-title">Complete seu Perfil</h2>
       <p class="modal-subtitle">Precisamos desses dados antes de iniciar seu treinamento.</p>
       
@@ -265,6 +282,10 @@
       document.getElementById('profile-form').addEventListener('submit', async (e) => {
         e.preventDefault()
         await saveProfile()
+      })
+
+      document.getElementById('close-profile-modal').addEventListener('click', () => {
+        document.getElementById('profile-modal').classList.remove('active')
       })
     })
 
