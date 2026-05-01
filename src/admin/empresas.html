@@ -4,17 +4,22 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gestão de Empresas — JMR Tecnologia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --black: #000000;
       --surface-1: #0D0D0D;
       --surface-2: #111827;
       --border: #1F2937;
       --green: #00FF41;
+      --green-hover: #00CC33;
       --text-primary: #F9FAFB;
       --text-secondary: #D1D5DB;
       --text-muted: #9CA3AF;
+      --text-faint: #6B7280;
       --font-display: 'Syne', sans-serif;
       --font-body: 'DM Sans', sans-serif;
     }
@@ -24,93 +29,401 @@
       background: var(--black); 
       color: var(--text-primary); 
       min-height: 100vh;
-      padding: 40px 20px;
     }
-    .container { max-width: 1200px; margin: 0 auto; }
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
-    .title { font-family: var(--font-display); font-size: 32px; font-weight: 700; }
-    .logout-btn { 
-      background: var(--green); 
-      color: #000; 
-      border: none; 
-      padding: 10px 20px; 
-      border-radius: 6px; 
-      cursor: pointer; 
+    .header { 
+      background: var(--surface-2); 
+      border-bottom: 1px solid var(--border); 
+      padding: 20px 40px; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+    }
+    .header-title { font-family: var(--font-display); font-size: 24px; font-weight: 700; }
+    .header-actions { display: flex; gap: 12px; }
+    .btn {
+      padding: 10px 20px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
       font-weight: 600;
+      font-size: 13px;
       transition: all 0.2s;
     }
-    .logout-btn:hover { background: #00CC33; }
-    .content { 
-      background: var(--surface-2); 
-      border: 1px solid var(--border); 
-      border-radius: 12px; 
-      padding: 40px; 
-      text-align: center;
+    .btn-primary { background: var(--green); color: #000; }
+    .btn-primary:hover { background: var(--green-hover); }
+    .btn-secondary { background: var(--surface-1); color: var(--text-primary); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: var(--border); }
+    
+    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
+    
+    .tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .tab {
+      padding: 12px 20px;
+      background: none;
+      border: none;
       color: var(--text-muted);
-    }
-    .user-info { margin-top: 20px; font-size: 14px; }
-    .badge { 
-      display: inline-block; 
-      background: var(--green); 
-      color: #000; 
-      padding: 4px 12px; 
-      border-radius: 4px; 
-      font-size: 12px; 
+      cursor: pointer;
       font-weight: 600;
-      margin-left: 10px;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
     }
+    
+    .tab.active {
+      color: var(--green);
+      border-bottom-color: var(--green);
+    }
+    
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    
+    .table-card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      overflow-x: auto;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    
+    th {
+      text-align: left;
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    td {
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    tr:last-child td { border-bottom: none; }
+    
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .status-active { background: rgba(0, 255, 65, 0.2); color: var(--green); }
+    .status-inactive { background: rgba(248, 113, 113, 0.2); color: #F87171; }
+    
+    .form-group {
+      margin-bottom: 16px;
+    }
+    
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-size: 14px;
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(0, 255, 65, 0.08);
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal.active { display: flex; }
+    
+    .modal-content {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    
+    .modal-title { font-family: var(--font-display); font-size: 20px; font-weight: 700; margin-bottom: 20px; }
+    
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+      justify-content: flex-end;
+    }
+    
+    .spinner { 
+      width: 20px; 
+      height: 20px; 
+      border: 2px solid var(--border); 
+      border-top-color: var(--green); 
+      border-radius: 50%; 
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <h1 class="title">Gestão de Empresas <span class="badge">Admin</span></h1>
-      <button class="logout-btn" id="logout-btn">Sair</button>
+  <div class="header">
+    <h1 class="header-title">Gestão de Empresas</h1>
+    <div class="header-actions">
+      <button class="btn btn-primary" id="new-company-btn">+ Nova Empresa</button>
+      <button class="btn btn-secondary" id="logout-btn">Sair</button>
     </div>
-    
-    <div class="content">
-      <p>Painel de administração — Gestão de empresas e usuários</p>
-      <p style="margin-top: 20px; font-size: 13px; color: var(--text-muted);">As empresas cadastradas aparecerão aqui.</p>
-      <div class="user-info" id="user-info"></div>
+  </div>
+
+  <div class="container">
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('companies')">Empresas</button>
+      <button class="tab" onclick="switchTab('users')">Usuários</button>
+    </div>
+
+    <!-- Aba: Empresas -->
+    <div id="companies" class="tab-content active">
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>Razão Social</th>
+              <th>Nome Fantasia</th>
+              <th>CNPJ</th>
+              <th>Segmento</th>
+              <th>Tamanho</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="companies-table">
+            <tr>
+              <td colspan="7" style="text-align: center; color: var(--text-muted);">
+                <div class="spinner" style="margin: 16px auto;"></div>
+                Carregando empresas...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Aba: Usuários -->
+    <div id="users" class="tab-content">
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>E-mail</th>
+              <th>Empresa</th>
+              <th>Role</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="users-table">
+            <tr>
+              <td colspan="5" style="text-align: center; color: var(--text-muted);">
+                <div class="spinner" style="margin: 16px auto;"></div>
+                Carregando usuários...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Nova Empresa -->
+  <div class="modal" id="company-modal">
+    <div class="modal-content">
+      <h2 class="modal-title">Nova Empresa</h2>
+      <form id="company-form">
+        <div class="form-group">
+          <label class="form-label">Razão Social</label>
+          <input type="text" class="form-input" id="razao_social" required placeholder="Ex: Acme Corporação LTDA">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nome Fantasia</label>
+          <input type="text" class="form-input" id="nome_fantasia" required placeholder="Ex: Acme Corp">
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">CNPJ</label>
+            <input type="text" class="form-input" id="cnpj" required placeholder="00.000.000/0000-00">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Segmento</label>
+            <input type="text" class="form-input" id="segmento" placeholder="Ex: Tecnologia">
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Tamanho</label>
+            <select class="form-input" id="tamanho">
+              <option value="Pequena">Pequena (até 50)</option>
+              <option value="Média">Média (até 500)</option>
+              <option value="Grande">Grande (500+)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <select class="form-input" id="status">
+              <option value="ativa">Ativa</option>
+              <option value="inativa">Inativa</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Logo URL (Opcional)</label>
+          <input type="url" class="form-input" id="logo_url" placeholder="https://exemplo.com/logo.png">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('company-modal')">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar Empresa</button>
+        </div>
+      </form>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    const SUPABASE_URL = 'https://qpmglhxlnbdzozrtffmf.supabase.co'
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwbWdsaHhsbmJkem96cnRmZm1mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1ODAyOTEsImV4cCI6MjA5MzE1NjI5MX0.LxZ-w8fkYv3wLcCyyxp8nft9uh1YI9kaV12mzUjh8YA'
-    const { createClient } = supabase
-    const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  <script type="module">
+    import { supabase } from '../../js/config/supabase.js'
+
+    const db = supabase
 
     document.addEventListener('DOMContentLoaded', async () => {
-      // Verificar autenticação
       const { data: { user } } = await db.auth.getUser()
-      if (!user) {
-        window.location.href = '/src/pages/login.html'
-        return
-      }
+      if (!user) { window.location.href = '/src/pages/login.html'; return; }
 
-      // Verificar role de admin
-      const { data: profile } = await db
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single()
+      const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single()
+      if (profile?.role !== 'admin') { window.location.href = '/src/pages/meus-cursos.html'; return; }
 
-      if (profile?.role !== 'admin') {
-        window.location.href = '/src/pages/meus-cursos.html'
-        return
-      }
+      await loadCompanies()
+      await loadUsers()
 
-      // Exibir informações do usuário
-      document.getElementById('user-info').innerHTML = `Logado como: <strong>${user.email}</strong> (Admin)`
-
-      // Logout
+      document.getElementById('new-company-btn').addEventListener('click', () => openModal('company-modal'))
       document.getElementById('logout-btn').addEventListener('click', async () => {
         await db.auth.signOut()
         window.location.href = '/src/pages/login.html'
       })
+
+      document.getElementById('company-form').addEventListener('submit', async (e) => {
+        e.preventDefault()
+        await saveCompany()
+      })
     })
+
+    async function loadCompanies() {
+      const { data, error } = await db.from('empresas').select('*').order('razao_social')
+      if (error) { console.error(error); return; }
+      
+      const tbody = document.getElementById('companies-table')
+      tbody.innerHTML = data.map(c => `
+        <tr>
+          <td>${c.razao_social}</td>
+          <td>${c.nome_fantasia}</td>
+          <td>${c.cnpj || '-'}</td>
+          <td>${c.segmento || '-'}</td>
+          <td>${c.tamanho || '-'}</td>
+          <td><span class="status-badge ${c.status === 'ativa' ? 'status-active' : 'status-inactive'}">${c.status || 'ativa'}</span></td>
+          <td>
+            <button class="btn btn-secondary" style="padding: 4px 8px;" onclick="editCompany('${c.id}')">Editar</button>
+          </td>
+        </tr>
+      `).join('')
+    }
+
+    async function loadUsers() {
+      const { data, error } = await db.from('profiles').select('*, empresas(nome_fantasia)').order('full_name')
+      if (error) { console.error(error); return; }
+      
+      const tbody = document.getElementById('users-table')
+      tbody.innerHTML = data.map(u => `
+        <tr>
+          <td>${u.full_name || 'Sem nome'}</td>
+          <td>${u.email}</td>
+          <td>${u.empresas?.nome_fantasia || 'Nenhuma'}</td>
+          <td>${u.role}</td>
+          <td>
+            <button class="btn btn-secondary" style="padding: 4px 8px;">Gerenciar</button>
+          </td>
+        </tr>
+      `).join('')
+    }
+
+    async function saveCompany() {
+      const companyData = {
+        razao_social: document.getElementById('razao_social').value,
+        nome_fantasia: document.getElementById('nome_fantasia').value,
+        cnpj: document.getElementById('cnpj').value,
+        segmento: document.getElementById('segmento').value,
+        tamanho: document.getElementById('tamanho').value,
+        status: document.getElementById('status').value,
+        logo_url: document.getElementById('logo_url').value,
+        data_cadastro: new Date().toISOString()
+      }
+
+      const { error } = await db.from('empresas').insert(companyData)
+      if (error) {
+        alert('Erro ao salvar empresa: ' + error.message)
+      } else {
+        closeModal('company-modal')
+        document.getElementById('company-form').reset()
+        await loadCompanies()
+      }
+    }
+
+    window.openModal = (id) => document.getElementById(id).classList.add('active')
+    window.closeModal = (id) => document.getElementById(id).classList.remove('active')
+    window.switchTab = (tabId) => {
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'))
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
+      document.getElementById(tabId).classList.add('active')
+      event.target.classList.add('active')
+    }
   </script>
 </body>
 </html>
