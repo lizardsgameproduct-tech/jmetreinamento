@@ -222,14 +222,15 @@ document.addEventListener('DOMContentLoaded', function() {
   const { createClient } = supabase
   const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-  // Redireciona por role
+  // Redireciona por role — caminhos absolutos para evitar loop
   function redirectByRole(role) {
+    const base = '/src/pages/'
     const routes = {
-      admin:       '../pages/admin/empresas.html',
-      gestor:      '../pages/dashboard-gestor.html',
-      colaborador: '../pages/meus-cursos.html'
+      admin:       base + 'admin/empresas.html',
+      gestor:      base + 'dashboard-gestor.html',
+      colaborador: base + 'meus-cursos.html'
     }
-    window.location.href = routes[role] ?? '../pages/meus-cursos.html'
+    window.location.replace(routes[role] ?? base + 'meus-cursos.html')
   }
 
   // Toast
