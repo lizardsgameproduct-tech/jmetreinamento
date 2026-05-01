@@ -24,13 +24,13 @@ function renderNavbar(profile, email) {
     
     if (role === 'admin') {
         menuItems = `
-            <a href="/src/pages/admin/empresas.html" class="nav-link">Empresas</a>
+            <a href="/src/admin/empresas.html" class="nav-link">Empresas</a>
             <a href="/src/pages/dashboard-gestor.html" class="nav-link">Relatórios</a>
             <a href="/src/pages/meus-cursos.html" class="nav-link">Meus Cursos</a>
         `
     } else if (role === 'gestor') {
         menuItems = `
-            <a href="/src/pages/dashboard-gestor.html" class="nav-link">Dashboard</a>
+            <a href="/src/pages/dashboard-gestor.html" class="nav-link">Empresa</a>
             <a href="/src/pages/meus-cursos.html" class="nav-link">Meus Cursos</a>
         `
     } else {
